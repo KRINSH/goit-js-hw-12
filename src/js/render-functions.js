@@ -1,8 +1,8 @@
 import SimpleLightbox from 'simplelightbox'
 import 'simplelightbox/dist/simple-lightbox.min.css'
 
-const imageGallery = document.querySelector('.image-gallery')
-const spinner = document.querySelector('.spinner')
+const imageGallery = document.querySelector('.gallery')
+const loader = document.querySelector('.loader')
 const loadMoreBtn = document.querySelector('.load-more-btn')
 
 let lightbox = null
@@ -73,11 +73,11 @@ function clearGallery() {
 }
 
 function showLoader() {
-	spinner.classList.remove('hidden')
+	loader.classList.remove('hidden')
 }
 
 function hideLoader() {
-	spinner.classList.add('hidden')
+	loader.classList.add('hidden')
 }
 
 function showLoadMoreButton() {
