@@ -13,10 +13,12 @@ import {
 
 const searchForm = document.querySelector('.form')
 const loadMoreBtn = document.querySelector('.load-more-btn')
+const gallery = document.querySelector('.gallery')
 
 let currentQuery = ''
 let currentPage = 1
 let totalHits = 0
+const perPage = 15
 
 // Скрываем кнопку Load more при загрузке
 hideLoadMoreButton()
@@ -67,12 +69,13 @@ async function handleSearch(event) {
 		totalHits = data.totalHits
 		createGallery(data.hits)
 
-		// Показываем кнопку Load more только если есть еще страницы
-		if (data.hits.length < totalHits) {
+		const totalPages = Math.ceil(totalHits / perPage)
+		if (currentPage < totalPages) {
 			showLoadMoreButton()
+		} else {
+			hideLoadMoreButton()
 		}
 
-		// Показываем сообщение о количестве найденных изображений
 		iziToast.success({
 			message: `Hooray! We found ${totalHits} images.`,
 			messageSize: '16px',
@@ -102,11 +105,16 @@ async function handleLoadMore() {
 		showLoader()
 		const data = await getImagesByQuery(currentQuery, currentPage)
 
+		// Получаем высоту первой карточки до добавления новых
+		const { height: cardHeight } =
+			gallery.firstElementChild.getBoundingClientRect()
+
 		createGallery(data.hits)
 
-		// Проверяем, есть ли еще страницы
-		const totalPages = Math.ceil(totalHits / 15)
-		if (currentPage >= totalPages) {
+		const totalPages = Math.ceil(totalHits / perPage)
+		if (currentPage < totalPages) {
+			showLoadMoreButton()
+		} else {
 			hideLoadMoreButton()
 			iziToast.info({
 				message: "We're sorry, but you've reached the end of search results.",
@@ -117,6 +125,12 @@ async function handleLoadMore() {
 				position: 'topRight',
 			})
 		}
+
+		// Плавная прокрутка к новым картинкам
+		window.scrollBy({
+			top: cardHeight * 2,
+			behavior: 'smooth',
+		})
 	} catch (error) {
 		iziToast.error({
 			message: `${error.message}. Please try again later`,
